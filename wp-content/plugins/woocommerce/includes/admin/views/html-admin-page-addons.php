@@ -2,120 +2,128 @@
 /**
  * Admin View: Page - Addons
  *
+ * @package WooCommerce/Admin
  * @var string $view
  * @var object $addons
  */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit;
 }
 
-$view 	= isset( $_GET['view'] ) ? sanitize_text_field( $_GET['view'] ) : '';
-$theme 	= wp_get_theme();
-
 ?>
-
 <div class="wrap woocommerce wc_addons_wrap">
-	<div class="icon32 icon32-posts-product" id="icon-woocommerce"><br /></div>
-	<h2>
-		<?php _e( 'WooCommerce Add-ons/Extensions', 'woocommerce' ); ?>
-		<a href="http://www.woothemes.com/product-category/woocommerce-extensions/" class="add-new-h2"><?php _e( 'Browse all extensions', 'woocommerce' ); ?></a>
-		<a href="http://www.woothemes.com/storefront/" class="add-new-h2"><?php _e( 'Need a theme? Try Storefront', 'woocommerce' ); ?></a>
-	</h2>
-	<?php if ( $addons ) : ?>
-		<ul class="subsubsub">
-			<?php
-				$links = array(
-					''                         => __( 'Popular', 'woocommerce' ),
-					'payment-gateways'         => __( 'Gateways', 'woocommerce' ),
-					'shipping-methods'         => __( 'Shipping', 'woocommerce' ),
-					'import-export-extensions' => __( 'Import/export', 'woocommerce' ),
-					'product-extensions'       => __( 'Products', 'woocommerce' ),
-					'marketing-extensions'     => __( 'Marketing', 'woocommerce' ),
-					'accounting-extensions'	   => __( 'Accounting', 'woocommerce' ),
-					'free-extensions'          => __( 'Free', 'woocommerce' ),
-					'third-party-extensions'   => __( 'Third-party', 'woocommerce' ),
-				);
+	<nav class="nav-tab-wrapper woo-nav-tab-wrapper">
+		<a href="<?php echo esc_url( admin_url( 'admin.php?page=wc-addons' ) ); ?>" class="nav-tab nav-tab-active"><?php esc_html_e( 'Browse Extensions', 'woocommerce' ); ?></a>
 
-				$i = 0;
-
-				foreach ( $links as $link => $name ) {
-					$i ++;
-					?><li><a class="<?php if ( $view == $link ) echo 'current'; ?>" href="<?php echo admin_url( 'admin.php?page=wc-addons&view=' . esc_attr( $link ) ); ?>"><?php echo $name; ?></a><?php if ( $i != sizeof( $links ) ) echo ' |'; ?></li><?php
-				}
-			?>
-		</ul>
-		<br class="clear" />
-		<ul class="products">
 		<?php
-			switch ( $view ) {
-				case '':
-					$addons = $addons->popular;
-				break;
-				case 'payment-gateways':
-					$addons = $addons->{'payment-gateways'};
-				break;
-				case 'shipping-methods':
-					$addons = $addons->{'shipping-methods'};
-				break;
-				case 'import-export-extensions':
-					$addons = $addons->{'import-export'};
-				break;
-				case 'product-extensions':
-					$addons = $addons->product;
-				break;
-				case 'marketing-extensions':
-					$addons = $addons->marketing;
-				break;
-				case 'accounting-extensions':
-					$addons = $addons->accounting;
-				break;
-				case 'free-extensions':
-					$addons = $addons->free;
-				break;
-				case 'third-party-extensions':
-					$addons = $addons->{'third-party'};
-				break;
-			}
-
-			foreach ( $addons as $addon ) {
-				echo '<li class="product">';
-				echo '<a href="' . $addon->link . '">';
-				if ( ! empty( $addon->image ) ) {
-					echo '<img src="' . $addon->image . '"/>';
-				} else {
-					echo '<h3>' . $addon->title . '</h3>';
-				}
-				echo '<span class="price">' . $addon->price . '</span>';
-				echo '<p>' . $addon->excerpt . '</p>';
-				echo '</a>';
-				echo '</li>';
-			}
+			$count_html = WC_Helper_Updater::get_updates_count_html();
+			// translators: Count of updates for WooCommerce.com subscriptions.
+			$menu_title = sprintf( __( 'WooCommerce.com Subscriptions %s', 'woocommerce' ), $count_html );
 		?>
+		<a href="<?php echo esc_url( admin_url( 'admin.php?page=wc-addons&section=helper' ) ); ?>" class="nav-tab"><?php echo wp_kses_post( $menu_title ); ?></a>
+	</nav>
+
+	<h1 class="screen-reader-text"><?php esc_html_e( 'WooCommerce Extensions', 'woocommerce' ); ?></h1>
+
+	<?php if ( $sections ) : ?>
+		<ul class="subsubsub">
+			<?php foreach ( $sections as $section ) : ?>
+				<li>
+					<a
+						class="<?php echo $current_section === $section->slug ? 'current' : ''; ?>"
+						href="<?php echo esc_url( admin_url( 'admin.php?page=wc-addons&section=' . esc_attr( $section->slug ) ) ); ?>">
+						<?php echo esc_html( $section->label ); ?>
+					</a>
+				</li>
+			<?php endforeach; ?>
 		</ul>
+
+		<?php if ( isset( $_GET['search'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
+			<h1 class="search-form-title" >
+				<?php printf( esc_html__( 'Showing search results for: %s', 'woocommerce' ), '<strong>' . esc_html( sanitize_text_field( wp_unslash( $_GET['search'] ) ) ) . '</strong>' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
+			</h1>
+		<?php endif; ?>
+
+		<form class="search-form" method="GET">
+			<button type="submit">
+				<span class="dashicons dashicons-search"></span>
+			</button>
+			<input
+				type="text"
+				name="search"
+				value="<?php echo esc_attr( isset( $_GET['search'] ) ? sanitize_text_field( wp_unslash( $_GET['search'] ) ) : '' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>"
+				placeholder="<?php esc_attr_e( 'Enter a search term and press enter', 'woocommerce' ); ?>">
+			<input type="hidden" name="page" value="wc-addons">
+			<?php $page_section = ( isset( $_GET['section'] ) && '_featured' !== $_GET['section'] ) ? sanitize_text_field( wp_unslash( $_GET['section'] ) ) : '_all'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
+			<input type="hidden" name="section" value="<?php echo esc_attr( $page_section ); ?>">
+		</form>
+		<?php if ( '_featured' === $current_section ) : ?>
+			<div class="addons-featured">
+				<?php
+					$featured = WC_Admin_Addons::get_featured();
+				?>
+			</div>
+		<?php endif; ?>
+		<?php if ( '_featured' !== $current_section && $addons ) : ?>
+			<?php if ( 'shipping_methods' === $current_section ) : ?>
+				<div class="addons-shipping-methods">
+					<?php WC_Admin_Addons::output_wcs_banner_block(); ?>
+				</div>
+			<?php endif; ?>
+			<ul class="products">
+			<?php foreach ( $addons as $addon ) : ?>
+				<?php
+				if ( 'shipping_methods' === $current_section ) {
+					// Do not show USPS or Canada Post extensions for US and CA stores, respectively.
+					$country = WC()->countries->get_base_country();
+					if ( 'US' === $country
+						&& false !== strpos(
+							$addon->link,
+							'woocommerce.com/products/usps-shipping-method'
+						)
+					) {
+						continue;
+					}
+					if ( 'CA' === $country
+						&& false !== strpos(
+							$addon->link,
+							'woocommerce.com/products/canada-post-shipping-method'
+						)
+					) {
+						continue;
+					}
+				}
+				?>
+				<li class="product">
+					<a href="<?php echo esc_attr( WC_Admin_Addons::add_in_app_purchase_url_params( $addon->link ) ); ?>">
+						<?php if ( ! empty( $addon->image ) ) : ?>
+							<span class="product-img-wrap"><img src="<?php echo esc_url( $addon->image ); ?>"/></span>
+						<?php else : ?>
+							<h2><?php echo esc_html( $addon->title ); ?></h2>
+						<?php endif; ?>
+						<span class="price"><?php echo wp_kses_post( $addon->price ); ?></span>
+						<p><?php echo wp_kses_post( $addon->excerpt ); ?></p>
+					</a>
+				</li>
+			<?php endforeach; ?>
+			</ul>
+		<?php endif; ?>
 	<?php else : ?>
-		<p><?php printf( __( 'Our catalog of WooCommerce Extensions can be found on WooThemes.com here: <a href="%s">WooCommerce Extensions Catalog</a>', 'woocommerce' ), 'http://www.woothemes.com/product-category/woocommerce-extensions/' ); ?></p>
+		<?php /* translators: a url */ ?>
+		<p><?php printf( wp_kses_post( __( 'Our catalog of WooCommerce Extensions can be found on WooCommerce.com here: <a href="%s">WooCommerce Extensions Catalog</a>', 'woocommerce' ) ), 'https://woocommerce.com/product-category/woocommerce-extensions/' ); ?></p>
 	<?php endif; ?>
 
-	<?php if ( 'Storefront' != $theme['Name'] ) : ?>
-
-	<div class="storefront">
-		<img src="<?php echo WC()->plugin_url(); ?>/assets/images/storefront.jpg" alt="Storefront" />
-
-		<h3><?php _e( 'Looking for a WooCommerce theme?', 'woocommerce' ); ?></h3>
-
-		<p>
-			<?php printf( __( 'We recommend Storefront, the %sofficial%s WooCommerce theme.', 'woocommerce' ), '<em>', '</em>' ); ?>
-		</p>
-
-		<p>
-			<?php printf( __( 'Storefront is an intuitive &amp; flexible, %sfree%s WordPress theme offering deep integration with WooCommerce and many of the most popular customer-facing extensions.', 'woocommerce' ), '<strong>', '</strong>' ); ?>
-		</p>
-
-		<p>
-			<a href="<?php echo esc_url( 'http://www.woothemes.com/storefront/' ); ?>" target="_blank" class="button"><?php _e( 'Read all about it', 'woocommerce' ) ?></a>
-			<a href="<?php echo esc_url( wp_nonce_url( self_admin_url( 'update.php?action=install-theme&theme=storefront' ), 'install-theme_storefront' ) ); ?>" class="button button-primary"><?php _e( 'Download &amp; install', 'woocommerce' ); ?></a>
-		</p>
-	</div>
-
+	<?php if ( 'Storefront' !== $theme['Name'] && '_featured' !== $current_section ) : ?>
+		<div class="storefront">
+			<a href="<?php echo esc_url( 'https://woocommerce.com/storefront/' ); ?>" target="_blank"><img src="<?php echo esc_url( WC()->plugin_url() ); ?>/assets/images/storefront.png" alt="<?php esc_attr_e( 'Storefront', 'woocommerce' ); ?>" /></a>
+			<h2><?php esc_html_e( 'Looking for a WooCommerce theme?', 'woocommerce' ); ?></h2>
+			<p><?php echo wp_kses_post( __( 'We recommend Storefront, the <em>official</em> WooCommerce theme.', 'woocommerce' ) ); ?></p>
+			<p><?php echo wp_kses_post( __( 'Storefront is an intuitive, flexible and <strong>free</strong> WordPress theme offering deep integration with WooCommerce and many of the most popular customer-facing extensions.', 'woocommerce' ) ); ?></p>
+			<p>
+				<a href="https://woocommerce.com/storefront/" target="_blank" class="button"><?php esc_html_e( 'Read all about it', 'woocommerce' ); ?></a>
+				<a href="<?php echo esc_url( wp_nonce_url( self_admin_url( 'update.php?action=install-theme&theme=storefront' ), 'install-theme_storefront' ) ); ?>" class="button button-primary"><?php esc_html_e( 'Download &amp; install', 'woocommerce' ); ?></a>
+			</p>
+		</div>
 	<?php endif; ?>
 </div>

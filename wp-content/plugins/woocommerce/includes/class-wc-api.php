@@ -1,319 +1,172 @@
 <?php
 /**
- * WooCommerce API
+ * WC-API endpoint handler.
  *
- * Handles WC-API endpoint requests
+ * This handles API related functionality in WooCommerce.
+ * - wc-api endpoint - Commonly used by Payment gateways for callbacks.
+ * - Legacy REST API - Deprecated in 2.6.0. @see class-wc-legacy-api.php
+ * - WP REST API - The main REST API in WooCommerce which is built on top of the WP REST API.
  *
- * @author   WooThemes
- * @category API
- * @package  WooCommerce/API
- * @since    2.0
+ * @package WooCommerce/API
+ * @since   2.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
-if ( ! class_exists( 'WC_API' ) ) :
-
-class WC_API {
-
-	/** This is the major version for the REST API and takes
-	 * first-order position in endpoint URLs
-	 */
-	const VERSION = '3.0.0';
-
-	/** @var WC_API_Server the REST API server */
-	public $server;
-
-	/** @var WC_API_Authentication REST API authentication class instance */
-	public $authentication;
+/**
+ * WC_API class.
+ */
+class WC_API extends WC_Legacy_API {
 
 	/**
-	 * Setup class
-	 *
-	 * @since 2.0
-	 * @return WC_API
+	 * Init the API by setting up action and filter hooks.
 	 */
-	public function __construct() {
-		// add query vars
-		add_filter( 'query_vars', array( $this, 'add_query_vars' ), 0 );
-
-		// register API endpoints
+	public function init() {
+		parent::init();
 		add_action( 'init', array( $this, 'add_endpoint' ), 0 );
-
-		// handle REST API requests
-		add_action( 'parse_request', array( $this, 'handle_rest_api_requests' ), 0 );
-
-		// handle wc-api endpoint requests
+		add_filter( 'query_vars', array( $this, 'add_query_vars' ), 0 );
 		add_action( 'parse_request', array( $this, 'handle_api_requests' ), 0 );
+		add_action( 'rest_api_init', array( $this, 'register_wp_admin_settings' ) );
+	}
 
-		// Ensure payment gateways are initialized in time for API requests
-		add_action( 'woocommerce_api_request', array( 'WC_Payment_Gateways', 'instance' ), 0 );
+	/**
+	 * Get the version of the REST API package being ran.
+	 *
+	 * @since 3.7.0
+	 * @return string|null
+	 */
+	public function get_rest_api_package_version() {
+		if ( ! $this->is_rest_api_loaded() ) {
+			return null;
+		}
+		return \Automattic\WooCommerce\RestApi\Package::get_version();
+	}
+
+	/**
+	 * Get the version of the REST API package being ran.
+	 *
+	 * @since 3.7.0
+	 * @return string
+	 */
+	public function get_rest_api_package_path() {
+		if ( ! $this->is_rest_api_loaded() ) {
+			return null;
+		}
+		return \Automattic\WooCommerce\RestApi\Package::get_path();
+	}
+
+	/**
+	 * Return if the rest API classes were already loaded.
+	 *
+	 * @since 3.7.0
+	 * @return boolean
+	 */
+	protected function is_rest_api_loaded() {
+		return class_exists( '\Automattic\WooCommerce\RestApi\Package', false );
+	}
+
+	/**
+	 * Get data from a WooCommerce API endpoint.
+	 *
+	 * @since 3.7.0
+	 * @param string $endpoint Endpoint.
+	 * @param array  $params Params to passwith request.
+	 * @return array|\WP_Error
+	 */
+	public function get_endpoint_data( $endpoint, $params = array() ) {
+		if ( ! $this->is_rest_api_loaded() ) {
+			return new WP_Error( 'rest_api_unavailable', __( 'The Rest API is unavailable.', 'woocommerce' ) );
+		}
+		$request = new \WP_REST_Request( 'GET', $endpoint );
+		if ( $params ) {
+			$request->set_query_params( $params );
+		}
+		$response = rest_do_request( $request );
+		$server   = rest_get_server();
+		$json     = wp_json_encode( $server->response_to_data( $response, false ) );
+		return json_decode( $json, true );
 	}
 
 	/**
 	 * Add new query vars.
 	 *
 	 * @since 2.0
-	 * @param $vars
+	 * @param array $vars Query vars.
 	 * @return string[]
 	 */
 	public function add_query_vars( $vars ) {
+		$vars   = parent::add_query_vars( $vars );
 		$vars[] = 'wc-api';
-		$vars[] = 'wc-api-version';
-		$vars[] = 'wc-api-route';
 		return $vars;
 	}
 
 	/**
-	 * Add new endpoints.
+	 * WC API for payment gateway IPNs, etc.
 	 *
 	 * @since 2.0
 	 */
 	public static function add_endpoint() {
-
-		// REST API
-		add_rewrite_rule( '^wc-api/v([1-3]{1})/?$', 'index.php?wc-api-version=$matches[1]&wc-api-route=/', 'top' );
-		add_rewrite_rule( '^wc-api/v([1-3]{1})(.*)?', 'index.php?wc-api-version=$matches[1]&wc-api-route=$matches[2]', 'top' );
-
-		// WC API for payment gateway IPNs, etc
+		parent::add_endpoint();
 		add_rewrite_endpoint( 'wc-api', EP_ALL );
-	}
-
-
-	/**
-	 * Handle REST API requests
-	 *
-	 * @since 2.2
-	 */
-	public function handle_rest_api_requests() {
-		global $wp;
-
-		if ( ! empty( $_GET['wc-api-version'] ) ) {
-			$wp->query_vars['wc-api-version'] = $_GET['wc-api-version'];
-		}
-
-		if ( ! empty( $_GET['wc-api-route'] ) ) {
-			$wp->query_vars['wc-api-route'] = $_GET['wc-api-route'];
-		}
-
-		// REST API request
-		if ( ! empty( $wp->query_vars['wc-api-version'] ) && ! empty( $wp->query_vars['wc-api-route'] ) ) {
-
-			define( 'WC_API_REQUEST', true );
-			define( 'WC_API_REQUEST_VERSION', absint( $wp->query_vars['wc-api-version'] ) );
-
-			// legacy v1 API request
-			if ( 1 === WC_API_REQUEST_VERSION ) {
-				$this->handle_v1_rest_api_request();
-			} else if ( 2 === WC_API_REQUEST_VERSION ) {
-				$this->handle_v2_rest_api_request();
-			} else {
-				$this->includes();
-
-				$this->server = new WC_API_Server( $wp->query_vars['wc-api-route'] );
-
-				// load API resource classes
-				$this->register_resources( $this->server );
-
-				// Fire off the request
-				$this->server->serve_request();
-			}
-
-			exit;
-		}
-	}
-
-	/**
-	 * Include required files for REST API request
-	 *
-	 * @since 2.1
-	 */
-	public function includes() {
-
-		// API server / response handlers
-		include_once( 'api/class-wc-api-exception.php' );
-		include_once( 'api/class-wc-api-server.php' );
-		include_once( 'api/interface-wc-api-handler.php' );
-		include_once( 'api/class-wc-api-json-handler.php' );
-
-		// authentication
-		include_once( 'api/class-wc-api-authentication.php' );
-		$this->authentication = new WC_API_Authentication();
-
-		include_once( 'api/class-wc-api-resource.php' );
-		include_once( 'api/class-wc-api-orders.php' );
-		include_once( 'api/class-wc-api-products.php' );
-		include_once( 'api/class-wc-api-coupons.php' );
-		include_once( 'api/class-wc-api-customers.php' );
-		include_once( 'api/class-wc-api-reports.php' );
-		include_once( 'api/class-wc-api-webhooks.php' );
-
-		// allow plugins to load other response handlers or resource classes
-		do_action( 'woocommerce_api_loaded' );
-	}
-
-	/**
-	 * Register available API resources
-	 *
-	 * @since 2.1
-	 * @param WC_API_Server $server the REST server
-	 */
-	public function register_resources( $server ) {
-
-		$api_classes = apply_filters( 'woocommerce_api_classes',
-			array(
-				'WC_API_Customers',
-				'WC_API_Orders',
-				'WC_API_Products',
-				'WC_API_Coupons',
-				'WC_API_Reports',
-				'WC_API_Webhooks',
-			)
-		);
-
-		foreach ( $api_classes as $api_class ) {
-			$this->$api_class = new $api_class( $server );
-		}
-	}
-
-
-	/**
-	 * Handle legacy v1 REST API requests.
-	 *
-	 * @since 2.2
-	 */
-	private function handle_v1_rest_api_request() {
-
-		// include legacy required files for v1 REST API request
-		include_once( 'api/v1/class-wc-api-server.php' );
-		include_once( 'api/v1/interface-wc-api-handler.php' );
-		include_once( 'api/v1/class-wc-api-json-handler.php' );
-		include_once( 'api/v1/class-wc-api-xml-handler.php' );
-
-		include_once( 'api/v1/class-wc-api-authentication.php' );
-		$this->authentication = new WC_API_Authentication();
-
-		include_once( 'api/v1/class-wc-api-resource.php' );
-		include_once( 'api/v1/class-wc-api-orders.php' );
-		include_once( 'api/v1/class-wc-api-products.php' );
-		include_once( 'api/v1/class-wc-api-coupons.php' );
-		include_once( 'api/v1/class-wc-api-customers.php' );
-		include_once( 'api/v1/class-wc-api-reports.php' );
-
-		// allow plugins to load other response handlers or resource classes
-		do_action( 'woocommerce_api_loaded' );
-
-		$this->server = new WC_API_Server( $GLOBALS['wp']->query_vars['wc-api-route'] );
-
-		// Register available resources for legacy v1 REST API request
-		$api_classes = apply_filters( 'woocommerce_api_classes',
-			array(
-				'WC_API_Customers',
-				'WC_API_Orders',
-				'WC_API_Products',
-				'WC_API_Coupons',
-				'WC_API_Reports',
-			)
-		);
-
-		foreach ( $api_classes as $api_class ) {
-			$this->$api_class = new $api_class( $this->server );
-		}
-
-		// Fire off the request
-		$this->server->serve_request();
-	}
-
-	/**
-	 * Handle legacy v2 REST API requests.
-	 *
-	 * @since 2.4
-	 */
-	private function handle_v2_rest_api_request() {
-		include_once( 'api/v2/class-wc-api-exception.php' );
-		include_once( 'api/v2/class-wc-api-server.php' );
-		include_once( 'api/v2/interface-wc-api-handler.php' );
-		include_once( 'api/v2/class-wc-api-json-handler.php' );
-
-		include_once( 'api/v2/class-wc-api-authentication.php' );
-		$this->authentication = new WC_API_Authentication();
-
-		include_once( 'api/v2/class-wc-api-resource.php' );
-		include_once( 'api/v2/class-wc-api-orders.php' );
-		include_once( 'api/v2/class-wc-api-products.php' );
-		include_once( 'api/v2/class-wc-api-coupons.php' );
-		include_once( 'api/v2/class-wc-api-customers.php' );
-		include_once( 'api/v2/class-wc-api-reports.php' );
-		include_once( 'api/class-wc-api-webhooks.php' );
-
-		// allow plugins to load other response handlers or resource classes
-		do_action( 'woocommerce_api_loaded' );
-
-		$this->server = new WC_API_Server( $GLOBALS['wp']->query_vars['wc-api-route'] );
-
-		// Register available resources for legacy v2 REST API request
-		$api_classes = apply_filters( 'woocommerce_api_classes',
-			array(
-				'WC_API_Customers',
-				'WC_API_Orders',
-				'WC_API_Products',
-				'WC_API_Coupons',
-				'WC_API_Reports',
-				'WC_API_Webhooks',
-			)
-		);
-
-		foreach ( $api_classes as $api_class ) {
-			$this->$api_class = new $api_class( $this->server );
-		}
-
-		// Fire off the request
-		$this->server->serve_request();
 	}
 
 	/**
 	 * API request - Trigger any API requests.
 	 *
-	 * @since    2.0
-	 * @version  2.4
+	 * @since   2.0
+	 * @version 2.4
 	 */
 	public function handle_api_requests() {
 		global $wp;
 
-		if ( ! empty( $_GET['wc-api'] ) ) {
-			$wp->query_vars['wc-api'] = $_GET['wc-api'];
+		if ( ! empty( $_GET['wc-api'] ) ) { // WPCS: input var okay, CSRF ok.
+			$wp->query_vars['wc-api'] = sanitize_key( wp_unslash( $_GET['wc-api'] ) ); // WPCS: input var okay, CSRF ok.
 		}
 
-		// wc-api endpoint requests
+		// wc-api endpoint requests.
 		if ( ! empty( $wp->query_vars['wc-api'] ) ) {
 
-			// Buffer, we won't want any output here
+			// Buffer, we won't want any output here.
 			ob_start();
 
-			// No cache headers
-			nocache_headers();
+			// No cache headers.
+			wc_nocache_headers();
 
-			// Clean the API request
+			// Clean the API request.
 			$api_request = strtolower( wc_clean( $wp->query_vars['wc-api'] ) );
 
-			// Trigger generic action before request hook
+			// Make sure gateways are available for request.
+			WC()->payment_gateways();
+
+			// Trigger generic action before request hook.
 			do_action( 'woocommerce_api_request', $api_request );
 
-			// Is there actually something hooked into this API request? If not trigger 400 - Bad request
+			// Is there actually something hooked into this API request? If not trigger 400 - Bad request.
 			status_header( has_action( 'woocommerce_api_' . $api_request ) ? 200 : 400 );
 
-			// Trigger an action which plugins can hook into to fulfill the request
+			// Trigger an action which plugins can hook into to fulfill the request.
 			do_action( 'woocommerce_api_' . $api_request );
 
-			// Done, clear buffer and exit
+			// Done, clear buffer and exit.
 			ob_end_clean();
-			die('-1');
+			die( '-1' );
+		}
+	}
+
+	/**
+	 * Register WC settings from WP-API to the REST API.
+	 *
+	 * @since  3.0.0
+	 */
+	public function register_wp_admin_settings() {
+		$pages = WC_Admin_Settings::get_settings_pages();
+		foreach ( $pages as $page ) {
+			new WC_Register_WP_Admin_Settings( $page, 'page' );
+		}
+
+		$emails = WC_Emails::instance();
+		foreach ( $emails->get_emails() as $email ) {
+			new WC_Register_WP_Admin_Settings( $email, 'email' );
 		}
 	}
 }
-
-endif;
-
-return new WC_API();
