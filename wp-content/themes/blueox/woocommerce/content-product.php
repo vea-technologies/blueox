@@ -26,17 +26,7 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 ?>
 <li <?php wc_product_class( '', $product ); ?>>
 	<?php
-<<<<<<< HEAD
 
-	/**
-	 * Hook: woocommerce_shop_loop_item_title.
-	 *
-	 * @hooked woocommerce_template_loop_product_title - 10
-	 */
-	do_action( 'woocommerce_shop_loop_item_title' );
-
-=======
->>>>>>> a657cb7b6da370e66c30c6418cd57c2238439a8c
 	/**
 	 * Hook: woocommerce_before_shop_loop_item.
 	 *
@@ -53,8 +43,6 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 	do_action( 'woocommerce_before_shop_loop_item_title' );
 
 	/**
-<<<<<<< HEAD
-=======
 	 * Hook: woocommerce_shop_loop_item_title.
 	 *
 	 * @hooked woocommerce_template_loop_product_title - 10
@@ -62,7 +50,6 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 	do_action( 'woocommerce_shop_loop_item_title' );
 
 	/**
->>>>>>> a657cb7b6da370e66c30c6418cd57c2238439a8c
 	 * Hook: woocommerce_after_shop_loop_item_title.
 	 *
 	 * @hooked woocommerce_template_loop_rating - 5
