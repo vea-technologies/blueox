@@ -224,3 +224,11 @@ function my_acf_json_save_point( $path ) {
     // return
     return $path;
 }
+
+
+/* FUNCTIONS BY KELLTON START */
+
+wp_enqueue_style( 'ktstyle_font', get_template_directory_uri() . '/assets/css/kt_fontawesome.min.css',false,rand(1,5),'all');
+wp_enqueue_style( 'ktstyle_slider', get_template_directory_uri() . '/assets/css/kt_slick.css',false,rand(1,5),'all');
+wp_enqueue_style( 'ktstyle', get_template_directory_uri() . '/assets/css/kt_style.css',false,rand(1,5),'all');
+
