@@ -224,3 +224,14 @@ function my_acf_json_save_point( $path ) {
     // return
     return $path;
 }
+
+
+ function new_project_script(){
+
+wp_enqueue_style('blueox.css',get_template_directory_uri()."/css/style.css");
+wp_enqueue_style('fontawesome.min.css',get_template_directory_uri()."/css/fontawesome.min.css");
+wp_enqueue_style('slick.css',get_template_directory_uri()."/css/slick.css");
+wp_enqueue_script('slick,js', get_template_directory_uri()."/js/slick.js");
+}
+
+add_action('wp_enqueue_scripts', 'new_project_script');
