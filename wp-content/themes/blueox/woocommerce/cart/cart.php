@@ -136,17 +136,29 @@ do_action( 'woocommerce_before_cart' ); ?>
 			<?php do_action( 'woocommerce_cart_contents' ); ?>
 
 			<tr>
+<<<<<<< HEAD
 			<td colspan="3"></td>
 				<td colspan="3" class="actions" align="top">
 
 					<?php if ( wc_coupons_enabled() ) { ?>
 						<div class="coupon">
 							<label for="coupon_code"><?php esc_html_e( 'Coupon:', 'woocommerce' ); ?></label> <input type="text" name="coupon_code" class="input-text" id="coupon_code" value="" placeholder="<?php esc_attr_e( 'Coupon code', 'woocommerce' ); ?>" /> <button style="margin: 0 0 0 12px;" type="submit" class="button btn-blue" name="apply_coupon" value="<?php esc_attr_e( 'Apply coupon', 'woocommerce' ); ?>"><?php esc_attr_e( 'Apply coupon', 'woocommerce' ); ?></button>
+=======
+				<td colspan="6" class="actions">
+
+					<?php if ( wc_coupons_enabled() ) { ?>
+						<div class="coupon">
+							<label for="coupon_code"><?php esc_html_e( 'Coupon:', 'woocommerce' ); ?></label> <input type="text" name="coupon_code" class="input-text" id="coupon_code" value="" placeholder="<?php esc_attr_e( 'Coupon code', 'woocommerce' ); ?>" /> <button type="submit" class="button" name="apply_coupon" value="<?php esc_attr_e( 'Apply coupon', 'woocommerce' ); ?>"><?php esc_attr_e( 'Apply coupon', 'woocommerce' ); ?></button>
+>>>>>>> a657cb7b6da370e66c30c6418cd57c2238439a8c
 							<?php do_action( 'woocommerce_cart_coupon' ); ?>
 						</div>
 					<?php } ?>
 
+<<<<<<< HEAD
 					<button type="submit" class="button btn-blue" name="update_cart" value="<?php esc_attr_e( 'Update cart', 'woocommerce' ); ?>"><?php esc_html_e( 'Update cart', 'woocommerce' ); ?></button>
+=======
+					<button type="submit" class="button" name="update_cart" value="<?php esc_attr_e( 'Update cart', 'woocommerce' ); ?>"><?php esc_html_e( 'Update cart', 'woocommerce' ); ?></button>
+>>>>>>> a657cb7b6da370e66c30c6418cd57c2238439a8c
 
 					<?php do_action( 'woocommerce_cart_actions' ); ?>
 
