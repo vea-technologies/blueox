@@ -7,6 +7,8 @@
  * @package WP_Bootstrap_4
  */
 
+error_reporting(E_ALL);
+
 if ( ! function_exists( 'wp_bootstrap_4_setup' ) ) :
 	function wp_bootstrap_4_setup() {
 
@@ -232,3 +234,5 @@ wp_enqueue_style('fontawesome.min.css',get_template_directory_uri()."/css/fontaw
 wp_enqueue_style( 'ktstyle_font', get_template_directory_uri() . '/assets/css/kt_fontawesome.min.css',false,rand(1,5),'all');
 wp_enqueue_style( 'ktstyle_slider', get_template_directory_uri() . '/assets/css/kt_slick.css',false,rand(1,5),'all');
 wp_enqueue_style( 'ktstyle', get_template_directory_uri() . '/assets/css/kt_style.css',false,rand(1,5),'all');
+
+
