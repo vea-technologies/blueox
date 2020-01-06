@@ -409,16 +409,22 @@ form.cart button, .add_to_cart_button, .product_type_simple {
 	font-weight: 400;
 	text-transform: uppercase;
 	padding: 8px 25px;
-	border: 1px solid #1b3d80;
+	border: 1px solid #1b3d80 !important;
 	width: auto;
-	background-color: #1b3d80;
+	background-color: #1b3d80 !important;
 	transition: all 300ms ease-in-out;
+}
+form.cart button:after, .add_to_cart_button:after, .product_type_simple:after {
+		color: inherit;
+    content: "\f054 \f054";
+    font-family: 'FontAwesome';
+    padding-left: 5px;
 }
 form.cart button:focus {
 	outline: none;
 }
-.add_to_cart_button:hover, .product_type_simple:hover {
-	color: #fff;
+form.cart button:hover, .add_to_cart_button:hover, .product_type_simple:hover {
+	color: #fff !important;
 }
 .recommededHeading span a {
 	color: #6d6d6d;
