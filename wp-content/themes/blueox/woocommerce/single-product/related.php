@@ -18,27 +18,37 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+global $product;
+?>
 
+<div class="paragraph">
+	<?php
+		the_content();
+	?>
+	</div>
+<?php
 if ( $related_products ) : ?>
 
-	<section class="related products">
+	<section class="related-products recommended">
+		<div class="recommededHeading">
+			<span><?php echo wc_get_product_category_list( $product->get_id() ); ?></span>
+			<h2><?php esc_html_e( 'Related products', 'woocommerce' ); ?></h2>
 
-		<h2 class="related-products"><?php esc_html_e( 'RECOMMENDED PRODUCTS', 'woocommerce' ); ?></h2>
+			<?php woocommerce_product_loop_start(); ?>
+				<div class="slider multiple-items">
+				<?php foreach ( $related_products as $related_product ) : ?>
+					<div class="recommededProduct">
+					<?php
+						$post_object = get_post( $related_product->get_id() );
 
-		<?php woocommerce_product_loop_start(); ?>
+						setup_postdata( $GLOBALS['post'] =& $post_object );
 
-			<?php foreach ( $related_products as $related_product ) : ?>
-
-				<?php
-				 	$post_object = get_post( $related_product->get_id() );
-
-					setup_postdata( $GLOBALS['post'] =& $post_object );
-
-					wc_get_template_part( 'content', 'product' ); ?>
-
-			<?php endforeach; ?>
-
-		<?php woocommerce_product_loop_end(); ?>
+						wc_get_template_part( 'content', 'product' ); ?>
+					</div>
+				<?php endforeach; ?>
+				</div>
+			<?php woocommerce_product_loop_end(); ?>
+		</div>
 
 	</section>
 

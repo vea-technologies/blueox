@@ -231,3 +231,35 @@ wp_enqueue_style('fontawesome.min.css',get_template_directory_uri()."/css/fontaw
 wp_enqueue_style( 'ktstyle_font', get_template_directory_uri() . '/assets/css/kt_fontawesome.min.css',false,rand(1,5),'all');
 wp_enqueue_style( 'ktstyle_slider', get_template_directory_uri() . '/assets/css/kt_slick.css',false,rand(1,5),'all');
 wp_enqueue_style( 'ktstyle', get_template_directory_uri() . '/assets/css/kt_style.css',false,rand(1,5),'all');
+
+// Remove breadcrumbs from shop & categories
+add_filter( 'woocommerce_before_main_content', 'remove_breadcrumbs');
+function remove_breadcrumbs() {
+		remove_action( 'woocommerce_before_main_content','woocommerce_breadcrumb', 20, 0);
+}
+
+add_filter( 'woocommerce_product_tabs', 'woo_remove_tabs', 98 );
+function woo_remove_tabs( $tabs ){
+    if(is_product()){
+      unset( $tabs['description'] ); // Remove the description tab
+      unset( $tabs['reviews'] ); // Remove the reviews tab
+      unset( $tabs['additional_information'] ); // Remove the additional information tab
+      }
+  return $tabs;
+ }
+
+/**
+ * Change number of related products output
+ */ 
+function woo_related_products_limit() {
+  global $product;
+	
+	$args['posts_per_page'] = 8;
+	return $args;
+}
+add_filter( 'woocommerce_output_related_products_args', 'jk_related_products_args', 20 );
+  function jk_related_products_args( $args ) {
+	$args['posts_per_page'] = 8; // 4 related products
+	$args['columns'] = 3; // arranged in 2 columns
+	return $args;
+}

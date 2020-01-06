@@ -209,7 +209,7 @@ img{max-width: 100%;}
 .featureList p{margin-bottom: 5px}
 .productSlider .slider-nav .items, .addsPart img{ height: 81px; width: 86px; border: 2px solid rgba(0, 0, 0, 0.2); overflow: hidden; margin: 10px;}
 .productSlider .slider-nav .items img{height: 100%; width: 100%;}
-.productSlider .slider-for{height: 500px; display: -webkit-flex;
+.productSlider .slider-for{/*height: 500px;*/ display: -webkit-flex;
 	display: -moz-flex;
 	display: -ms-flex;
 	display: -o-flex;
@@ -234,7 +234,7 @@ top: 50%; left: 50%; transform: translate(-50%, -50%);
 }
 .recommededHeading span{color: #6d6d6d;font-size: 14.09px;}
 .recommededHeading h2{font-size: 2.625rem;color: #1b3d80; margin-bottom: 40px;}
-.recommended{margin-bottom: 120px;}
+.recommended{padding-bottom: 120px;}
 .recommededProduct{box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
 	margin: 10px auto;max-width: 270px;
 	padding: 25px;
@@ -265,7 +265,7 @@ top: 50%; left: 50%; transform: translate(-50%, -50%);
 }
 .counterArrow{width: 20px;}
 .onlyNumber{border:none;border-right: 1px solid  #002d62;width: 100% ;padding: 5px;}
-.mediaGroup{'display: -webkit-flex;
+.mediaGroup{display: -webkit-flex;
 display: -moz-flex;
 display: -ms-flex;
 display: -o-flex;
@@ -323,4 +323,135 @@ display: flex;
 	.recommededProduct span{text-align: left;}
 	.recommededHeading h2 { font-size: 1.6rem;    margin-bottom: 10px;text-align: center;}
 
+}
+
+
+/* Hemant CSS */
+.kadence-woo-template-builder {
+	background: #fff;
+}
+.kadence-woo-template-builder .woocommerce-product-gallery {
+	width: 100% !important;
+	flex: unset !important;
+	max-width: 100% !important;
+	position: relative;
+}
+.kadence-woo-template-builder .woocommerce-product-gallery .flex-viewport {
+	height: 500px !important;
+}
+.woocommerce-product-gallery__wrapper a {
+	width: 100%;
+	height: 500px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.woocommerce-product-gallery__trigger {
+	position: absolute;
+	right: 30px;
+	top: 30px;
+	z-index: 9;
+	width: 40px;
+	height: 40px;
+	text-align: center;
+	line-height: 40px;
+	border-radius: 100%;
+	background: #e8e8e8;
+}
+.woocommerce-product-gallery .flex-control-thumbs {
+	padding: 0;
+	display: flex;
+	justify-content: center;
+}
+.woocommerce-product-gallery .flex-control-thumbs li {
+	width: 100px;
+	height: 100px;
+	border: 2px solid rgba(0, 0, 0, 0.2);
+	margin: 10px 5px;
+}
+
+.product-detail-right .title-price-wrap{
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+}
+.product-detail-right .title-price-wrap h1 {
+	font-size: 20px;
+	margin: 0;
+	color: #002d62;
+}
+.product-detail-right .title-price-wrap .price {
+	font-weight: bold;
+	color: #002d62;
+	font-size: 20px;
+	margin: 0;
+}
+form.cart {
+    display: flex;
+}
+form.cart .quantity {
+    padding-right: 20px;
+}
+form.cart .quantity input {
+	height: 40px;
+}
+form.cart .quantity input:focus {
+	outline: none;
+	box-shadow: none;
+	border: 1px solid #ccc;
+}
+form.cart button, .add_to_cart_button, .product_type_simple {
+	color: #fff;
+	cursor: pointer;
+	font-family: 'Gotham-Light', sans-serif;
+	font-weight: 400;
+	text-transform: uppercase;
+	padding: 8px 25px;
+	border: 1px solid #1b3d80;
+	width: auto;
+	background-color: #1b3d80;
+	transition: all 300ms ease-in-out;
+}
+form.cart button:focus {
+	outline: none;
+}
+.add_to_cart_button:hover, .product_type_simple:hover {
+	color: #fff;
+}
+.recommededHeading span a {
+	color: #6d6d6d;
+	font-size: 14.09px;
+	text-transform: uppercase;
+}
+.recommededHeading h2 {
+	text-transform: uppercase;
+}
+.slick-slide > div {
+	text-align: center;
+}
+.recommededProduct li {
+	text-align: left;
+}
+.recommededProduct li a {
+	display: block;
+	text-align: left;
+}
+.recommededProduct li a h2 {
+	font-size: 18px;
+	color: #002d62;
+	margin: 10px 0 10px 0;
+}
+.recommededProduct li a.product_type_simple {
+	display: inline-block;
+}
+.recommededProduct li a:hover {
+	text-decoration: none;
+}
+.recommededHeading .slick-dots {
+	bottom: -50px; 
+}
+.recommededHeading .slick-dots li button::before {
+	display: none;
 }

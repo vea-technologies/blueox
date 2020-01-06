@@ -18,5 +18,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
-
-the_title( '<h5 class="font-gotham-book product_title entry-title">', '</h5>' );
+?>
+<div class="title-price-wrap">
+<?php
+the_title( '<h1 class="product_title entry-title">', '</h1>' );
