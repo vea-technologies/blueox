@@ -431,8 +431,9 @@ form.cart button:focus {
 .slick-slide > div {
 	text-align: center;
 }
-.recommededProduct li {
+ul.products .recommededProduct li.product {
 	text-align: left;
+	width: 100%;
 }
 .recommededProduct li a {
 	display: block;
