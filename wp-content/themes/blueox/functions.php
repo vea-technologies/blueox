@@ -225,13 +225,6 @@ function my_acf_json_save_point( $path ) {
     return $path;
 }
 
-add_filter( 'woocommerce_add_to_cart_validation', 'remove_cart_item_before_add_to_cart', 20, 3 );
-function remove_cart_item_before_add_to_cart( $passed, $product_id, $quantity ) {
-    if( ! WC()->cart->is_empty() )
-        WC()->cart->empty_cart();
-    return $passed;
-}
-
 /* FUNCTIONS BY KELLTON START */
 
 wp_enqueue_style('fontawesome.min.css',get_template_directory_uri()."/css/fontawesome.min.css");
