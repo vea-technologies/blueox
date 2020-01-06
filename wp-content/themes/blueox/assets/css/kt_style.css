@@ -462,3 +462,6 @@ ul.products .recommededProduct li.product {
 .recommededHeading .slick-dots li button::before {
 	display: none;
 }
+body.single.single-product {
+    background: #fff;
+}
