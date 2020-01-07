@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: Cart */
+Template Name: Checkout */
 get_header(); ?>
 
 <?php
@@ -18,7 +18,7 @@ get_header(); ?>
 
 				<div id="primary" class="content-area">
 					<main id="main" class="site-main">
-						<div class="cart-page">
+						<div class="checkout-page">
 							<h1><?php the_title(); ?></h1>
 							<?php
 								the_content();
