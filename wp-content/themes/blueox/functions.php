@@ -263,3 +263,63 @@ add_filter( 'woocommerce_output_related_products_args', 'jk_related_products_arg
 	$args['columns'] = 3; // arranged in 2 columns
 	return $args;
 }
+
+//create a post type in woocommerce post pages
+function product_section(){
+	global $post;
+	wp_nonce_field( basename( __FILE__ ), 'prfx_nonce' );
+	$product_id = get_post_meta($post->ID,'product_id', true);
+
+	?><div class="wrap">
+		<table class="form-table">
+			<tbody class="input_fields_wrap_about_video">
+				<tr>
+					<td><input type="text" name="product_id" id="product_id" value="<?php echo trim($product_id); ?>" class="regular-text"></td>
+					
+				</tr>
+				
+				
+			</tbody>
+		</table>
+		
+	</div><?php
+}
+
+function blueox_metaboxes() {
+    global $post;
+	
+	if($post->post_type == "product"){
+	add_meta_box('Product-ids','Products ID','product_section','product');	
+	}
+}
+add_action( 'add_meta_boxes', 'blueox_metaboxes' );
+
+
+//for save the data of post type
+
+
+function blueox_meta_save($post_id) {
+	global $post;
+	$is_autosave = wp_is_post_autosave( $post_id );
+	$is_revision = wp_is_post_revision( $post_id );
+	$is_valid_nonce = ( isset( $_POST[ 'prfx_nonce' ] ) && wp_verify_nonce( $_POST[ 'prfx_nonce' ], basename( __FILE__ ) ) ) ? 'true' : 'false';
+    // Exits script depending on save status
+    if ( $is_autosave || $is_revision || !$is_valid_nonce ) {
+        return;
+    }
+	
+	
+	
+	if($post->post_type == "product"){
+	$product_id= $_POST["product_id"];
+	update_post_meta($post_id,'product_id', $product_id);
+	}
+	
+}
+		
+add_action('save_post', 'blueox_meta_save' );
+
+
+
+
+

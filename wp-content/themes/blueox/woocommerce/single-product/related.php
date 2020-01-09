@@ -26,6 +26,45 @@ global $product;
 		the_content();
 	?>
 	</div>
+
+<?php 	
+
+$product_id= get_post_meta(get_the_ID(),'product_id',true);
+$product_ids = str_replace(',', '', $product_id);
+$product_values = str_replace(' ', '', $product_ids);
+
+if(is_numeric($product_values)){ ?>
+<div class="additional_product">
+<?php 
+	$values= explode(',',$product_id);
+    $args = array('post_type'      => 'product','posts_per_page' => -1,'post__in' => $values, );
+	$loop = new WP_Query( $args );
+	?>
+	<h5>Additional Products:</h5>
+	
+	<?php
+    while ( $loop->have_posts() ) : $loop->the_post(); ?>
+	
+	<div class="product_content">
+	<?php 
+	
+	echo '<h5><a class="product_title">'.get_the_title().'</a></h5>';
+    echo '<br /><a href="'.get_permalink().'">' . woocommerce_get_product_thumbnail().'</a>';
+	echo '<br /><a href="?add-to-cart='.get_the_ID().'" data-quantity="1" class="button product_type_simple add_to_cart_button ajax_add_to_cart" data-product_id="'.get_the_ID().'" data-product_sku="'.get_the_title().'" rel="nofollow">Add to cart</a>';
+	?>
+	</div>
+	<?php 
+    endwhile;
+	wp_reset_query();
+	
+?>
+	
+</div>
+
+<?php } 
+
+?>
+	
 <?php
 if ( $related_products ) : ?>
 
