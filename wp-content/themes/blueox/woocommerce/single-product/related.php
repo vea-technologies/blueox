@@ -26,6 +26,46 @@ global $product;
 		the_content();
 	?>
 	</div>
+
+<?php 	
+
+$product_id= get_post_meta(get_the_ID(),'product_id',true);
+$product_ids = str_replace(',', '', $product_id);
+$product_values = str_replace(' ', '', $product_ids);
+
+if(is_numeric($product_values)){ ?>
+<div class="additional-product-wrap">
+<?php 
+	$values= explode(',',$product_id);
+    $args = array('post_type'      => 'product','posts_per_page' => -1,'post__in' => $values, );
+	$loop = new WP_Query( $args );
+	?>
+	<h3>This item requires additional parts for install</h3>
+	<div class="additional-product-block">
+	<?php
+    while ( $loop->have_posts() ) : $loop->the_post(); ?>
+	
+	<div class="additional-product-item">
+	<?php 
+
+  echo '<div class="additional-product-img"><a href="'.get_permalink().'">' . woocommerce_get_product_thumbnail().'</a></div>';
+	echo '<div class="additional-product-info"><h5><a href="'.get_permalink().'" class="product_title">'.get_the_title().'</a></h5>';
+	echo '<a href="?add-to-cart='.get_the_ID().'" data-quantity="1" class="button product_type_simple add_to_cart_button ajax_add_to_cart" data-product_id="'.get_the_ID().'" data-product_sku="'.get_the_title().'" rel="nofollow">Add to cart</a></div>';
+
+	?>
+	</div>
+	<?php 
+    endwhile;
+	wp_reset_query();
+	
+?>
+	</div>
+</div>
+
+<?php } 
+
+?>
+	
 <?php
 if ( $related_products ) : ?>
 

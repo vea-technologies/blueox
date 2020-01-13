@@ -243,6 +243,7 @@ top: 50%; left: 50%; transform: translate(-50%, -50%);
 }
 .recommededProduct h5{font-size: 18px; color: #002d62;}
 .recommededProduct span{font-size: 24px;color: #7f7f7f;}
+.recommededProduct span.woocommerce-Price-currencySymbol {color: #002d62;}
 .footerRecomPro h6{font-size: 13px; color: #7f7f7f;}
 .recommededHeading .slick-dots button{height: 13px;width: 13px;border-radius: 50%; background-color: #b0b0b0; font-size: 0;border:0;}
 .recommededHeading .slick-dots li{padding: 0 6px;}
@@ -433,6 +434,7 @@ form.cart button:hover, .add_to_cart_button:hover, .product_type_simple:hover {
 	color: #6d6d6d;
 	font-size: 14.09px;
 	text-transform: uppercase;
+	pointer-events: none;
 }
 .recommededHeading h2 {
 	text-transform: uppercase;
@@ -447,6 +449,12 @@ ul.products .recommededProduct li.product {
 .recommededProduct li a {
 	display: block;
 	text-align: left;
+}
+.recommededProduct li a:focus {
+	outline: none;
+}
+.recommededProduct li a.added_to_cart {
+	display: inline-block;
 }
 .recommededProduct li a h2 {
 	font-size: 18px;
@@ -489,6 +497,64 @@ body.single.single-product {
 	color: #002d62;
 	background: #fff;
 }
+.additional-product-wrap {
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 60px;
+	padding-bottom: 60px;
+}
+.additional-product-wrap > h3 {
+	padding: 10px 15px;
+	margin-bottom: 40px;
+	font-size: 18px;
+	font-family: 'Gotham-Book';
+	font-weight: normal;
+	color: #fff;
+	text-transform: uppercase;
+	display: inline-block;
+	background: #6d6d6d;
+}
+.additional-product-block {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0 -15px;
+}
+.additional-product-item {
+	flex: 0 0 33.3333%;
+	max-width: 33.3333%;
+	padding: 0 15px;
+	display: flex;
+	flex-wrap: wrap;
+}
+.additional-product-img {
+	flex: 0 0 30%;
+	max-width: 30%;
+}
+.additional-product-img a {
+	display: block;
+	border: 2px solid #ccc;
+	padding: 10px;
+}
+.additional-product-info {
+	flex: 0 0 70%;
+	max-width: 70%;
+	padding-left: 20px;
+}
+.additional-product-info h5 {
+	font-size: 18px;
+	font-family: 'Gotham-Book';
+	font-weight: normal;
+	color: #000;
+	text-transform: uppercase;
+	margin-bottom: 20px;
+}
+.additional-product-info h5 a {
+	color: #000;
+}
+.additional-product-info a.button, .additional-product-info a.added_to_cart {
+	padding: 8px 12px;
+	font-size: 12px;
+}
+
 /* cart page */
 body.page-template-cart-template {
 	background: #fff;
@@ -1018,7 +1084,10 @@ label.woocommerce-form__label.woocommerce-form__label-for-checkbox.woocommerce-f
 	max-width: 30%;
 	text-align: right;
 }
-.my_account_orders_col-2 a.woocommerce-button, .woof_reset_search_form {
+a.button.ajax_add_to_cart.added {
+	display: none;
+}
+.my_account_orders_col-2 a.woocommerce-button, .woof_reset_search_form, a.added_to_cart {
 	color: #fff;
 	cursor: pointer;
 	font-family: 'Gotham-Light', sans-serif;
@@ -1032,13 +1101,13 @@ label.woocommerce-form__label.woocommerce-form__label-for-checkbox.woocommerce-f
 	color: #fff;
 	display: inline-block;
 }
-.my_account_orders_col-2 a.woocommerce-button:after, .woof_reset_search_form:after {
+.my_account_orders_col-2 a.woocommerce-button:after, .woof_reset_search_form:after, a.added_to_cart:after {
 	color: inherit;
 	content: "\f054 \f054";
 	font-family: 'FontAwesome';
 	padding-left: 5px;
 }
-.my_account_orders_col-2 a.woocommerce-button:hover, .woof_reset_search_form:hover {
+.my_account_orders_col-2 a.woocommerce-button:hover, .woof_reset_search_form:hover, a.added_to_cart:hover {
 	background: #fff;
 	color: #002d62;
 }
@@ -1273,6 +1342,11 @@ label.woocommerce-form__label.woocommerce-form__label-for-checkbox.woocommerce-f
 	.learn-btn a {
 		padding: 8px 10px;
 	}
+	.additional-product-item {
+		flex: 0 0 50%;
+		max-width: 50%;
+		margin-bottom: 10px;
+	}
 }
 @media screen and (max-width: 767px) {
 	form table.shop_table thead {
@@ -1352,5 +1426,10 @@ label.woocommerce-form__label.woocommerce-form__label-for-checkbox.woocommerce-f
 	.learn-btn a {
 		padding: 8px 10px;
 		font-size: 12px;
+	}
+	.additional-product-item {
+		flex: 0 0 100%;
+		max-width: 100%;
+		margin-bottom: 10px;
 	}
 }
