@@ -319,6 +319,24 @@ function blueox_meta_save($post_id) {
 		
 add_action('save_post', 'blueox_meta_save' );
 
+//product category content
+add_action( 'woocommerce_after_shop_loop_item', 'woo_show_excerpt_shop_page', 5 );
+function woo_show_excerpt_shop_page() {
+	global $product;
+	if(is_shop()) {
+		echo '<p>' . $product->post->post_excerpt . '</p>';
+	}
+}
+
+//number of products you wanna show per page
+add_filter( 'loop_shop_per_page', 'new_loop_shop_per_page', 20 );
+
+function new_loop_shop_per_page( $cols ) {
+  // $cols contains the current number of products per page based on the value stored on Options -> Reading
+  // Return the number of products you wanna show per page.
+  $cols = 9;
+  return $cols;
+}
 
 
 
